@@ -1,0 +1,30 @@
+version: "3.9"
+
+services:
+  minio:
+    image: minio/minio:latest
+    container_name: minio-technical-interview
+    restart: unless-stopped
+    stop_grace_period: 30s
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_REGION_NAME: ${MINIO_REGION_NAME}
+      MINIO_SERVER_URL: https://${VIRTUAL_HOST}
+      TZ: ${TZ}
+      # Variables pour nginx-proxy et letsencrypt-nginx-proxy-companion
+      VIRTUAL_HOST: ${VIRTUAL_HOST}
+      VIRTUAL_PORT: 9001
+      LETSENCRYPT_HOST: ${VIRTUAL_HOST}
+      LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL}
+    volumes:
+      - minio-data:/data
+    expose:
+      - "9000"  # API S3
+      - "9001"  # Console (désactivée si MINIO_BROWSER=off)
+
+volumes:
+  minio-data:
+    driver: local
+
