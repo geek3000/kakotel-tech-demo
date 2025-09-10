@@ -21,10 +21,9 @@ services:
     volumes:
       - minio-data:/data
     expose:
-      - "9000"  # API S3
+#      - "9000"  # API S3
       - "9001"  # Console (désactivée si MINIO_BROWSER=off)
 
 volumes:
   minio-data:
     driver: local
-
