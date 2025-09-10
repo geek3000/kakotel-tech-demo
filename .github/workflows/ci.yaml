@@ -1,0 +1,40 @@
+name: KAKOTEL TECHNICAL INTERVIEW
+
+on:
+  push:
+    branches:
+      - '*'
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    env:
+    
+      docker_tag_suffix: ''
+
+
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Check PR Origin
+        id: check_origin
+        run: |
+          PR_REPO_URL=$(jq -r '.pull_request.head.repo.clone_url' "$GITHUB_EVENT_PATH")
+          BASE_REPO_URL=$(jq -r '.repository.clone_url' "$GITHUB_EVENT_PATH")
+          if [ "$PR_REPO_URL" != "null" -a "$PR_REPO_URL" != "$BASE_REPO_URL" ]; then
+            echo "PR is from a fork."
+            echo "same_origin=false" >> $GITHUB_OUTPUT
+          else
+            echo "Either it is not a PR or PR is from the same origin."
+            echo "same_origin=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Move cache
+        if: steps.check_origin.outputs.same_origin == 'true'
+        run: |
+          rm -rf /tmp/.buildx-cache
+          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
