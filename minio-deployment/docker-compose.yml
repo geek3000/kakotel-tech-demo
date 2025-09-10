@@ -20,6 +20,8 @@ services:
       LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL}
     volumes:
       - minio-data:/data
+    networks:
+      - proxy-net
     expose:
 #      - "9000"  # API S3
       - "9001"  # Console (désactivée si MINIO_BROWSER=off)
@@ -27,3 +29,9 @@ services:
 volumes:
   minio-data:
     driver: local
+
+networks:
+
+    proxy-net:
+        name: proxy-net
+        external: true
